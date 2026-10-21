@@ -229,10 +229,16 @@ h1 {
 
 .button-running {
   position: fixed;
-  z-index: 10;
+  z-index: 100;
+  width: 125px;
   min-width: 125px;
+  height: 54px;
+  min-height: 54px;
+  padding: 10px;
+  margin: 0;
   animation: button-teleport 220ms ease-out both;
   box-shadow: 0 8px 22px rgba(211, 72, 122, 0.18);
+  touch-action: manipulation;
 }
 
 .reaction {

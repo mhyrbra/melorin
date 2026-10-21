@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const messages = [
   'نههه! هنوز قهررری؟ 🥺',
@@ -404,35 +404,56 @@ export default function App() {
   const [noPosition, setNoPosition] = useState(null);
   const [showNote, setShowNote] = useState(false);
 
+  useEffect(() => {
+    const keepButtonVisible = () => {
+      setNoPosition((position) => {
+        if (!position) return null;
+
+        return {
+          x: Math.max(16, Math.min(position.x, window.innerWidth - 141)),
+          y: Math.max(16, Math.min(position.y, window.innerHeight - 70)),
+        };
+      });
+    };
+
+    window.addEventListener('resize', keepButtonVisible);
+
+    return () => {
+      window.removeEventListener('resize', keepButtonVisible);
+    };
+  }, []);
+
   const handleNo = () => {
     if (forgiven) return;
 
     setNoCount((count) => count + 1);
     setShowNote(true);
 
-    const padding = 18;
     const buttonWidth = 125;
     const buttonHeight = 54;
+    const padding = 16;
 
     const maxX = Math.max(padding, window.innerWidth - buttonWidth - padding);
 
     const maxY = Math.max(padding, window.innerHeight - buttonHeight - padding);
 
-    let x = padding + Math.random() * (maxX - padding);
-    let y = padding + Math.random() * (maxY - padding);
+    const currentX = noPosition?.x ?? window.innerWidth / 2;
+    const currentY = noPosition?.y ?? window.innerHeight * 0.7;
 
-    // Avoid placing the No button directly over the Yes button.
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight * 0.76;
+    let x;
+    let y;
+    let attempts = 0;
 
-    if (
-      Math.abs(x + buttonWidth / 2 - centerX) < 100 &&
-      Math.abs(y + buttonHeight / 2 - centerY) < 85
-    ) {
-      y = padding + Math.random() * Math.max(1, maxY - padding);
-    }
+    do {
+      x = padding + Math.random() * (maxX - padding);
+      y = padding + Math.random() * (maxY - padding);
+      attempts++;
+    } while (attempts < 20 && Math.hypot(x - currentX, y - currentY) < 140);
 
-    setNoPosition({ x, y });
+    setNoPosition({
+      x: Math.min(x, window.innerWidth - buttonWidth - padding),
+      y: Math.min(y, window.innerHeight - buttonHeight - padding),
+    });
   };
 
   const handleYes = () => {
@@ -486,15 +507,15 @@ export default function App() {
               {!noPosition && (
                 <button
                   className='button button-no'
-                  onPointerEnter={(event) => {
-                    if (event.pointerType === 'mouse') {
-                      handleNo();
-                    }
-                  }}
-                  onTouchStart={(event) => {
-                    event.preventDefault();
-                    handleNo();
-                  }}
+                  //   onPointerEnter={(event) => {
+                  //     if (event.pointerType === 'mouse') {
+                  //       handleNo();
+                  //     }
+                  //   }}
+                  //   onTouchStart={(event) => {
+                  //     event.preventDefault();
+                  //     handleNo();
+                  //   }}
                   onClick={handleNo}
                 >
                   نه 🙈
@@ -509,15 +530,15 @@ export default function App() {
                   left: noPosition.x,
                   top: noPosition.y,
                 }}
-                onPointerEnter={(event) => {
-                  if (event.pointerType === 'mouse') {
-                    handleNo();
-                  }
-                }}
-                onTouchStart={(event) => {
-                  event.preventDefault();
-                  handleNo();
-                }}
+                // onPointerEnter={(event) => {
+                //   if (event.pointerType === 'mouse') {
+                //     handleNo();
+                //   }
+                // }}
+                // onTouchStart={(event) => {
+                //   event.preventDefault();
+                //   handleNo();
+                // }}
                 onClick={handleNo}
               >
                 نههه 🙈
